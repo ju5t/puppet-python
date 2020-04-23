@@ -252,7 +252,11 @@ class python::install {
             }
           }
 
-          $virtualenv_package = "${python}-virtualenv"
+          if (String($python::version) =~ /^python3/) and ($facts['os']['family'] == 'RedHat') and (versioncmp($facts['os']['release']['major'], '8') >= 0) {
+            $virtualenv_package = "python3-virtualenv"
+          } else {
+            $virtualenv_package = "${python}-virtualenv"
+          }
         }
         'Debian': {
           if fact('lsbdistcodename') == 'trusty' {
@@ -269,7 +273,11 @@ class python::install {
         }
       }
 
-      if String($python::version) =~ /^python3/ {
+      if (String($python::version) =~ /^python3/) and ($facts['os']['family'] == 'RedHat') and (versioncmp($facts['os']['release']['major'], '8') >= 0) {
+        $pip_category = undef
+        $pip_package = "python3-pip"
+        $pip_provider = $python.regsubst(/^.*python36\.?/,'pip3.').regsubst(/\.$/,'')
+      elsif String($python::version) =~ /^python3/ {
         $pip_category = undef
         $pip_package = "${python}-pip"
         $pip_provider = $python.regsubst(/^.*python3\.?/,'pip3.').regsubst(/\.$/,'')
